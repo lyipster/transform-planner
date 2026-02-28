@@ -507,22 +507,7 @@ const SESSIONS = [
   },
 ];
 
-const TRACK_COLORS = {
-  "Plenary Stage": { bg: "#1a1a2e", text: "#e8d5a3", dot: "#e8d5a3" },
-  "AI + Humanity": { bg: "#0d1f3c", text: "#7ab8ff", dot: "#4a90d9" },
-  "Culture + Belonging": { bg: "#1f1a2e", text: "#c4a7e7", dot: "#9b72d4" },
-  "Health + Wellbeing": { bg: "#0d2e1f", text: "#7aeba3", dot: "#3db87a" },
-  "Performance Reimagined": { bg: "#2e1a0d", text: "#f0b97a", dot: "#d4853d" },
-  "Leading at the Edge": { bg: "#2e0d1a", text: "#f07ab4", dot: "#d43d73" },
-  "Horizons Stage": { bg: "#1a2e2e", text: "#7ae8e8", dot: "#3db8b8" },
-  "Learning Lab by Deloitte": { bg: "#2e2a0d", text: "#e8e07a", dot: "#b8b03d" },
-  "Innovation Stage by SemperVirens": { bg: "#1a2e0d", text: "#a3e87a", dot: "#73b83d" },
-  "Networking & Events": { bg: "#1e1e1e", text: "#aaaaaa", dot: "#666666" },
-  "Roundtables": { bg: "#1e1e1e", text: "#aaaaaa", dot: "#666666" },
-  "EXP": { bg: "#1e1e1e", text: "#aaaaaa", dot: "#666666" },
-};
 
-const DAYS = ["Sunday, March 22", "Monday, March 23", "Tuesday, March 24", "Wednesday, March 25"];
 const TRACK_COLORS = {
   "Plenary Stage":                    { dark: { bg: "#1a1a2e", text: "#e8d5a3", dot: "#e8d5a3" }, light: { bg: "#fdf6e3", text: "#7a6520", dot: "#b8900a" } },
   "AI + Humanity":                    { dark: { bg: "#0d1f3c", text: "#7ab8ff", dot: "#4a90d9" }, light: { bg: "#eaf4ff", text: "#1a5fa0", dot: "#2a7abf" } },
@@ -540,7 +525,6 @@ const TRACK_COLORS = {
 
 const DAYS = ["Sunday, March 22", "Monday, March 23", "Tuesday, March 24", "Wednesday, March 25"];
 
-// Conflict detection
 const timeToMins = (t) => {
   const [time, ampm] = t.split(" ");
   let [h, m] = time.split(":").map(Number);
@@ -560,7 +544,6 @@ const sessionsOverlap = (a, b) => {
 const findConflict = (session, selectedMap) =>
   SESSIONS.find(s => s.id !== session.id && selectedMap[s.id] && sessionsOverlap(session, s));
 
-// ICS export
 const toICSDate = (date, timeStr) => {
   const [time, ampm] = timeStr.split(" ");
   let [h, m] = time.split(":").map(Number);
@@ -584,7 +567,7 @@ const generateICS = (sessions) => {
       `DTEND:${toICSDate(s.date, s.end)}`,
       `SUMMARY:${s.title}`,
       `DESCRIPTION:${s.speakers.join(", ") || "Transform HR 2026"}`,
-      `LOCATION:${s.room} – Transform HR 2026\\, Las Vegas`,
+      `LOCATION:${s.room} – Transform HR 2026\, Las Vegas`,
       "END:VEVENT"
     );
   });
@@ -625,65 +608,28 @@ export default function ConferencePlanner() {
 
   useEffect(() => {
     if (!loaded) return;
-    try {
-      localStorage.setItem("transform2026-selections", JSON.stringify(selected));
-    } catch (e) {}
+    try { localStorage.setItem("transform2026-selections", JSON.stringify(selected)); } catch (e) {}
   }, [selected, loaded]);
 
   useEffect(() => {
     if (!loaded) return;
-    try {
-      localStorage.setItem("transform2026-theme", darkMode ? "dark" : "light");
-    } catch (e) {}
+    try { localStorage.setItem("transform2026-theme", darkMode ? "dark" : "light"); } catch (e) {}
   }, [darkMode, loaded]);
 
-  // Theme tokens
   const T = darkMode ? {
-    pageBg: "#0a0a0f",
-    headerBg: "linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%)",
-    tabBg: "#0c0c14",
-    cardBg: "#0f0f14",
-    border: "#111",
-    borderSubtle: "#1a1a1a",
-    borderMid: "#222",
-    text: "#e8e8e8",
-    textMuted: "#666",
-    textDim: "#555",
-    textFaint: "#3a3a3a",
-    textLabel: "#888",
-    heading: "#f0e8d8",
-    accent: "#c4a060",
-    accentBg: "#0a0a0f",
-    checkBorder: "#333",
-    selectBg: "#0a0a0f",
-    footerBg: "#0a0a0f",
-    footerBorder: "#151515",
-    footerText: "#444",
-    dayInactive: "#555",
-    themeIcon: "☀️",
+    pageBg: "#0a0a0f", headerBg: "linear-gradient(180deg, #0f0f1a 0%, #0a0a0f 100%)",
+    tabBg: "#0c0c14", cardBg: "#0f0f14", border: "#111", borderSubtle: "#1a1a1a",
+    borderMid: "#222", text: "#e8e8e8", textMuted: "#666", textDim: "#555",
+    textFaint: "#3a3a3a", textLabel: "#888", heading: "#f0e8d8", accent: "#c4a060",
+    accentBg: "#0a0a0f", checkBorder: "#333", selectBg: "#0a0a0f", footerBg: "#0a0a0f",
+    footerBorder: "#151515", footerText: "#444", dayInactive: "#555", themeIcon: "☀️",
   } : {
-    pageBg: "#faf8f4",
-    headerBg: "linear-gradient(180deg, #f0ece4 0%, #faf8f4 100%)",
-    tabBg: "#f0ece4",
-    cardBg: "#ffffff",
-    border: "#e0dcd4",
-    borderSubtle: "#e8e4dc",
-    borderMid: "#d8d4cc",
-    text: "#2a2820",
-    textMuted: "#888",
-    textDim: "#777",
-    textFaint: "#bbb",
-    textLabel: "#666",
-    heading: "#1a1810",
-    accent: "#a07828",
-    accentBg: "#faf8f4",
-    checkBorder: "#ccc",
-    selectBg: "#faf8f4",
-    footerBg: "#f0ece4",
-    footerBorder: "#ddd",
-    footerText: "#999",
-    dayInactive: "#999",
-    themeIcon: "🌙",
+    pageBg: "#faf8f4", headerBg: "linear-gradient(180deg, #f0ece4 0%, #faf8f4 100%)",
+    tabBg: "#f0ece4", cardBg: "#ffffff", border: "#e0dcd4", borderSubtle: "#e8e4dc",
+    borderMid: "#d8d4cc", text: "#2a2820", textMuted: "#888", textDim: "#777",
+    textFaint: "#bbb", textLabel: "#666", heading: "#1a1810", accent: "#a07828",
+    accentBg: "#faf8f4", checkBorder: "#ccc", selectBg: "#faf8f4", footerBg: "#f0ece4",
+    footerBorder: "#ddd", footerText: "#999", dayInactive: "#999", themeIcon: "🌙",
   };
 
   const toggle = (id) => {
@@ -718,7 +664,6 @@ export default function ConferencePlanner() {
     !["Networking & Events", "Roundtables", "EXP"].includes(t))];
 
   const makeGcalLink = (s) => {
-    const fmt = (dt) => dt.replace(/[-:]/g, "");
     const start = toICSDate(s.date, s.start);
     const end = toICSDate(s.date, s.end);
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(s.title)}&dates=${start}/${end}&details=${encodeURIComponent(s.speakers.join(", "))}&location=${encodeURIComponent(s.room + " – Transform 2026, Las Vegas")}`;
@@ -739,21 +684,15 @@ export default function ConferencePlanner() {
   return (
     <div style={{ minHeight: "100vh", background: T.pageBg, color: T.text, fontFamily: "'Georgia', 'Times New Roman', serif", position: "relative", transition: "background 0.2s, color 0.2s" }}>
 
-      {/* Header */}
       <div style={{ borderBottom: `1px solid ${T.borderMid}`, padding: "28px 32px 20px", display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, flexWrap: "wrap", background: T.headerBg }}>
         <div>
           <div style={{ fontSize: 10, letterSpacing: 4, color: T.textMuted, textTransform: "uppercase", marginBottom: 6, fontFamily: "monospace" }}>
             Transform HR · Las Vegas · March 22–25, 2026
           </div>
-          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 400, letterSpacing: 1, color: T.heading }}>
-            Conference Planner
-          </h1>
+          <h1 style={{ margin: 0, fontSize: 26, fontWeight: 400, letterSpacing: 1, color: T.heading }}>Conference Planner</h1>
         </div>
         <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
-          <button onClick={() => setDarkMode(d => !d)} style={{
-            ...btnStyle(false),
-            padding: "7px 12px", fontSize: 14, borderColor: T.borderSubtle,
-          }} title="Toggle light/dark mode">
+          <button onClick={() => setDarkMode(d => !d)} style={{ ...btnStyle(false), padding: "7px 12px", fontSize: 14, borderColor: T.borderSubtle }} title="Toggle light/dark mode">
             {T.themeIcon}
           </button>
           <button onClick={() => setView("all")} style={btnStyle(view === "all")}>Browse</button>
@@ -767,25 +706,19 @@ export default function ConferencePlanner() {
         </div>
       </div>
 
-      {/* Conflict toast */}
       {conflictFlash && (
         <div style={{ position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)", background: darkMode ? "#2a1010" : "#fff0f0", border: `1px solid ${darkMode ? "#8b3a3a" : "#e08080"}`, borderRadius: 4, padding: "10px 18px", zIndex: 1000, maxWidth: 480, display: "flex", alignItems: "center", gap: 10, boxShadow: "0 4px 24px #00000040" }}>
           <span style={{ fontSize: 14 }}>⚠️</span>
-          <span style={{ fontSize: 12, fontFamily: "monospace", color: darkMode ? "#f09090" : "#c04040", letterSpacing: 0.5, lineHeight: 1.5 }}>
-            {conflictFlash.message}
-          </span>
+          <span style={{ fontSize: 12, fontFamily: "monospace", color: darkMode ? "#f09090" : "#c04040", letterSpacing: 0.5, lineHeight: 1.5 }}>{conflictFlash.message}</span>
         </div>
       )}
 
-      {/* Day tabs */}
       {view === "all" && (
         <div style={{ display: "flex", borderBottom: `1px solid ${T.borderSubtle}`, background: T.tabBg, padding: "0 32px" }}>
           {DAYS.map(d => (
             <button key={d} onClick={() => setActiveDay(d)} style={{ padding: "14px 20px", border: "none", background: "transparent", color: activeDay === d ? T.accent : T.dayInactive, borderBottom: activeDay === d ? `2px solid ${T.accent}` : "2px solid transparent", cursor: "pointer", fontSize: 12, letterSpacing: 1, fontFamily: "monospace", transition: "color 0.2s" }}>
               {dayShort(d)} {dayNum(d)}
-              {SESSIONS.filter(s => s.day === d && selected[s.id]).length > 0 && (
-                <span style={{ marginLeft: 5, color: T.accent, fontSize: 9 }}>●</span>
-              )}
+              {SESSIONS.filter(s => s.day === d && selected[s.id]).length > 0 && <span style={{ marginLeft: 5, color: T.accent, fontSize: 9 }}>●</span>}
             </button>
           ))}
           <div style={{ flex: 1 }} />
@@ -795,7 +728,6 @@ export default function ConferencePlanner() {
         </div>
       )}
 
-      {/* My Schedule header */}
       {view === "mine" && (
         <div style={{ padding: "14px 32px", borderBottom: `1px solid ${T.borderSubtle}`, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", background: T.tabBg }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
@@ -803,11 +735,7 @@ export default function ConferencePlanner() {
               {selectedCount} session{selectedCount !== 1 ? "s" : ""} selected
             </span>
             {selectedCount > 0 && (
-              <button
-                onClick={() => downloadICS(selectedSessions)}
-                style={{ ...btnStyle(true), padding: "6px 14px", fontSize: 11 }}
-                title="Download as .ics file to import into Google Calendar or Apple Calendar"
-              >
+              <button onClick={() => downloadICS(selectedSessions)} style={{ ...btnStyle(true), padding: "6px 14px", fontSize: 11 }} title="Download .ics to import into Google Calendar or Apple Calendar">
                 ⬇ Export all to calendar
               </button>
             )}
@@ -818,7 +746,6 @@ export default function ConferencePlanner() {
         </div>
       )}
 
-      {/* Content */}
       <div style={{ padding: "24px 32px 80px" }}>
         {view === "mine" && selectedCount === 0 && (
           <div style={{ textAlign: "center", padding: "80px 20px", color: T.textMuted }}>
@@ -850,67 +777,60 @@ export default function ConferencePlanner() {
 
                   return (
                     <div key={s.id} style={{
-                      display: "flex", gap: 0, borderRadius: 3, overflow: "hidden",
-                      border: `1px solid ${isFlashing ? (darkMode ? "#8b3a3a" : "#e08080") : isSelected ? colors.dot + "60" : isBlocked ? (darkMode ? "#2a1a1a" : "#f0dada") : T.border}`,
-                      background: isFlashing ? (darkMode ? "#1a0d0d" : "#fff5f5") : isSelected ? colors.bg : isBlocked ? (darkMode ? "#0d0a0a" : "#fdf5f5") : T.cardBg,
+                      display: "flex", borderRadius: 3, overflow: "hidden",
+                      border: `1px solid ${isFlashing ? (darkMode?"#8b3a3a":"#e08080") : isSelected ? colors.dot+"60" : isBlocked ? (darkMode?"#2a1a1a":"#f0dada") : T.border}`,
+                      background: isFlashing ? (darkMode?"#1a0d0d":"#fff5f5") : isSelected ? colors.bg : isBlocked ? (darkMode?"#0d0a0a":"#fdf5f5") : T.cardBg,
                       transition: "all 0.15s",
                       opacity: (isNetworking && !isSelected) ? 0.6 : isBlocked ? 0.5 : 1,
                     }}>
-                      {/* Checkbox */}
-                      <div onClick={() => toggle(s.id)} style={{ width: 44, minHeight: 54, display: "flex", alignItems: "center", justifyContent: "center", cursor: isBlocked ? "not-allowed" : "pointer", flexShrink: 0, background: isSelected ? colors.dot + "18" : "transparent", borderRight: `1px solid ${T.borderSubtle}`, transition: "background 0.15s" }}>
+                      <div onClick={() => toggle(s.id)} style={{ width: 44, minHeight: 54, display: "flex", alignItems: "center", justifyContent: "center", cursor: isBlocked ? "not-allowed" : "pointer", flexShrink: 0, background: isSelected ? colors.dot+"18" : "transparent", borderRight: `1px solid ${T.borderSubtle}`, transition: "background 0.15s" }}>
                         {isBlocked ? (
-                          <div style={{ width: 16, height: 16, borderRadius: 2, border: `1.5px solid ${darkMode ? "#4a2020" : "#dda0a0"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: darkMode ? "#6a3030" : "#cc8080" }}>✕</div>
+                          <div style={{ width: 16, height: 16, borderRadius: 2, border: `1.5px solid ${darkMode?"#4a2020":"#dda0a0"}`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: darkMode?"#6a3030":"#cc8080" }}>✕</div>
                         ) : (
-                          <div style={{ width: 16, height: 16, borderRadius: 2, border: `1.5px solid ${isSelected ? colors.dot : T.checkBorder}`, background: isSelected ? colors.dot : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s", fontSize: 10, color: darkMode ? "#0a0a0f" : "#fff" }}>
+                          <div style={{ width: 16, height: 16, borderRadius: 2, border: `1.5px solid ${isSelected ? colors.dot : T.checkBorder}`, background: isSelected ? colors.dot : "transparent", display: "flex", alignItems: "center", justifyContent: "center", transition: "all 0.15s", fontSize: 10, color: darkMode?"#0a0a0f":"#fff" }}>
                             {isSelected && "✓"}
                           </div>
                         )}
                       </div>
 
-                      {/* Time */}
                       <div style={{ width: 90, padding: "10px 12px", display: "flex", flexDirection: "column", justifyContent: "center", flexShrink: 0, borderRight: `1px solid ${T.borderSubtle}` }}>
                         <div style={{ fontSize: 11, fontFamily: "monospace", color: isSelected ? colors.text : T.textDim, letterSpacing: 0.5 }}>{s.start}</div>
                         <div style={{ fontSize: 10, fontFamily: "monospace", color: T.textFaint, marginTop: 1 }}>–{s.end}</div>
                       </div>
 
-                      {/* Content */}
                       <div onClick={() => setExpandedId(isExpanded ? null : s.id)} style={{ flex: 1, padding: "10px 14px", cursor: "pointer", minWidth: 0 }}>
-                        <div style={{ fontSize: 13, fontWeight: 400, lineHeight: 1.4, color: isSelected ? T.heading : T.text, marginBottom: s.speakers.length > 0 ? 4 : 0 }}>
+                        <div style={{ fontSize: 13, lineHeight: 1.4, color: isSelected ? T.heading : T.text, marginBottom: s.speakers.length > 0 ? 4 : 0 }}>
                           {s.title}
                         </div>
                         {s.speakers.length > 0 && !isExpanded && (
                           <div style={{ fontSize: 10, color: T.textDim, fontFamily: "monospace", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {s.speakers.slice(0, 3).join(" · ")}{s.speakers.length > 3 ? ` +${s.speakers.length - 3}` : ""}
+                            {s.speakers.slice(0,3).join(" · ")}{s.speakers.length > 3 ? ` +${s.speakers.length-3}` : ""}
                           </div>
                         )}
                         {isExpanded && s.speakers.length > 0 && (
                           <div style={{ marginTop: 6 }}>
-                            {s.speakers.map((sp, i) => (
-                              <div key={i} style={{ fontSize: 10, color: T.textLabel, fontFamily: "monospace", marginTop: 2 }}>{sp}</div>
-                            ))}
+                            {s.speakers.map((sp, i) => <div key={i} style={{ fontSize: 10, color: T.textLabel, fontFamily: "monospace", marginTop: 2 }}>{sp}</div>)}
                           </div>
                         )}
                         <div style={{ marginTop: 5, display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-                          <span style={{ fontSize: 9, fontFamily: "monospace", letterSpacing: 1, color: isSelected ? colors.dot : isBlocked ? (darkMode ? "#5a2a2a" : "#cc9090") : T.textFaint, textTransform: "uppercase" }}>
+                          <span style={{ fontSize: 9, fontFamily: "monospace", letterSpacing: 1, color: isSelected ? colors.dot : isBlocked ? (darkMode?"#5a2a2a":"#cc9090") : T.textFaint, textTransform: "uppercase" }}>
                             <span style={{ marginRight: 4, fontSize: 7 }}>●</span>{s.track}
                           </span>
                           <span style={{ fontSize: 9, color: T.textFaint, fontFamily: "monospace" }}>{s.room}</span>
                           {isBlocked && (
-                            <span style={{ fontSize: 9, fontFamily: "monospace", color: darkMode ? "#7a3030" : "#cc6060", letterSpacing: 0.5 }}>
-                              conflicts with: {conflictingWith.title.length > 38 ? conflictingWith.title.slice(0, 38) + "…" : conflictingWith.title}
+                            <span style={{ fontSize: 9, fontFamily: "monospace", color: darkMode?"#7a3030":"#cc6060", letterSpacing: 0.5 }}>
+                              conflicts with: {conflictingWith.title.length > 38 ? conflictingWith.title.slice(0,38)+"…" : conflictingWith.title}
                             </span>
                           )}
                         </div>
                       </div>
 
-                      {/* Per-session calendar icon */}
                       {isSelected && (
-                        <a href={makeGcalLink(s)} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} title="Add to Google Calendar" style={{ width: 40, display: "flex", alignItems: "center", justifyContent: "center", color: T.textDim, textDecoration: "none", fontSize: 14, flexShrink: 0, borderLeft: `1px solid ${T.borderSubtle}`, transition: "color 0.1s" }}
+                        <a href={makeGcalLink(s)} target="_blank" rel="noreferrer" onClick={e => e.stopPropagation()} title="Add to Google Calendar"
+                          style={{ width: 40, display: "flex", alignItems: "center", justifyContent: "center", color: T.textDim, textDecoration: "none", fontSize: 14, flexShrink: 0, borderLeft: `1px solid ${T.borderSubtle}`, transition: "color 0.1s" }}
                           onMouseOver={e => e.currentTarget.style.color = colors.dot}
                           onMouseOut={e => e.currentTarget.style.color = T.textDim}
-                        >
-                          📅
-                        </a>
+                        >📅</a>
                       )}
                     </div>
                   );
@@ -921,7 +841,6 @@ export default function ConferencePlanner() {
         })}
       </div>
 
-      {/* Footer legend */}
       <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, background: T.footerBg, borderTop: `1px solid ${T.footerBorder}`, padding: "10px 32px", display: "flex", gap: 16, alignItems: "center", overflowX: "auto", flexWrap: "nowrap" }}>
         {Object.entries(TRACK_COLORS).filter(([t]) => !["Networking & Events","Roundtables","EXP"].includes(t)).map(([track, tColors]) => (
           <div key={track} style={{ display: "flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
