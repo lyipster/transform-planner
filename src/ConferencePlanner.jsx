@@ -116,7 +116,7 @@ const SESSIONS = [
   },
   {
     id: "t5", day: "Tuesday, March 24", date: "2026-03-24", start: "9:45 AM", end: "10:05 AM",
-    title: "Making AI Work: A Playbook for Modern HR Leaders", room: "Plenary Stage", track: "Plenary Stage",
+    title: "Making AI Work: A Playbook for Modern HR Leaders", room: "Lafite 4-9", track: "Plenary Stage",
     speakers: ["Lars Schmidt – Amplify Talent", "Jacqui Canney – ServiceNow"]
   },
   {
@@ -169,7 +169,7 @@ const SESSIONS = [
   },
   {
     id: "t16", day: "Tuesday, March 24", date: "2026-03-24", start: "12:00 PM", end: "12:45 PM",
-    title: "The Rise of Predictive HR: Because Guessing Isn't a Strategy", room: "Performance Reimagined Stage", track: "Performance Reimagined",
+    title: "The Rise of Predictive HR: Because Guessing Isn't a Strategy", room: "", track: "Performance Reimagined",
     speakers: ["Lana Peters – Klaar", "Sarika Lamont – Vidyard", "Sunita Solao – Upwork", "Mark Schaerrer – Verisys Corporation"]
   },
   {
@@ -661,7 +661,7 @@ export default function ConferencePlanner() {
     : { [activeDay]: filteredSessions };
 
   const allTracks = ["All", ...Array.from(new Set(SESSIONS.map(s => s.track))).filter(t =>
-    !["Networking & Events", "Roundtables", "EXP"].includes(t))];
+    !["Networking & Events", "Roundtables", "EXP", "Plenary Stage", "Innovation Stage by SemperVirens", "Learning Lab by Deloitte", "Horizons Stage"].includes(t))];
 
   const makeGcalLink = (s) => {
     const start = toICSDate(s.date, s.start);
@@ -737,6 +737,11 @@ export default function ConferencePlanner() {
             {selectedCount > 0 && (
               <button onClick={() => downloadICS(selectedSessions)} style={{ ...btnStyle(true), padding: "6px 14px", fontSize: 11 }} title="Download .ics to import into Google Calendar or Apple Calendar">
                 ⬇ Export all to calendar
+              </button>
+            )}
+            {selectedCount > 0 && (
+              <button onClick={() => setSelected({})} style={{ ...btnStyle(false), padding: "6px 14px", fontSize: 11, borderColor: darkMode ? "#3a2a2a" : "#e0c0c0", color: darkMode ? "#8a4a4a" : "#c04040" }}>
+                ✕ Deselect all
               </button>
             )}
           </div>
