@@ -595,6 +595,8 @@ export default function ConferencePlanner() {
   const [expandedId, setExpandedId] = useState(null);
   const [conflictFlash, setConflictFlash] = useState(null);
   const [darkMode, setDarkMode] = useState(true);
+  const [sharedSchedule, setSharedSchedule] = useState(null); // {ids: Set, label: string} when viewing shared link
+  const [shareToast, setShareToast] = useState(null); // "copied" | "empty"
 
   useEffect(() => {
     try {
@@ -602,6 +604,17 @@ export default function ConferencePlanner() {
       if (saved) setSelected(JSON.parse(saved));
       const savedTheme = localStorage.getItem("transform2026-theme");
       if (savedTheme !== null) setDarkMode(savedTheme === "dark");
+    } catch (e) {}
+    // Check for shared schedule in URL
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const sParam = params.get("s");
+      const nameParam = params.get("name");
+      if (sParam) {
+        const ids = new Set(sParam.split("|").filter(Boolean));
+        setSharedSchedule({ ids, label: nameParam ? decodeURIComponent(nameParam) + "'s schedule" : "shared schedule" });
+        setView("mine");
+      }
     } catch (e) {}
     setLoaded(true);
   }, []);
@@ -651,7 +664,7 @@ export default function ConferencePlanner() {
 
   const filteredSessions = SESSIONS.filter(s => {
     const dayMatch = view === "mine" ? true : s.day === activeDay;
-    const selMatch = view === "mine" ? selected[s.id] : true;
+    const selMatch = view === "mine" ? (sharedSchedule ? sharedSchedule.ids.has(s.id) : selected[s.id]) : true;
     const trackMatch = filterTrack === "All" || s.track === filterTrack;
     return dayMatch && selMatch && trackMatch;
   });
@@ -667,6 +680,21 @@ export default function ConferencePlanner() {
     const start = toICSDate(s.date, s.start);
     const end = toICSDate(s.date, s.end);
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(s.title)}&dates=${start}/${end}&details=${encodeURIComponent(s.speakers.join(", "))}&location=${encodeURIComponent(s.room + " – Transform 2026, Las Vegas")}`;
+  };
+
+  const copyShareLink = () => {
+    if (selectedCount === 0) {
+      setShareToast("empty");
+      setTimeout(() => setShareToast(null), 2500);
+      return;
+    }
+    const ids = Object.keys(selected).filter(id => selected[id]);
+    const encoded = "|" + ids.join("|") + "|";
+    const url = window.location.origin + window.location.pathname + "?s=" + encoded;
+    navigator.clipboard.writeText(url).then(() => {
+      setShareToast("copied");
+      setTimeout(() => setShareToast(null), 2500);
+    });
   };
 
   const dayShort = (d) => d.split(", ")[0].slice(0, 3);
@@ -706,10 +734,35 @@ export default function ConferencePlanner() {
         </div>
       </div>
 
+      {/* Share toast */}
+      {shareToast && (
+        <div style={{ position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)", background: shareToast === "copied" ? (darkMode ? "#0d1f0d" : "#f0faf0") : (darkMode ? "#2a1010" : "#fff0f0"), border: `1px solid ${shareToast === "copied" ? (darkMode ? "#3a7a3a" : "#80c080") : (darkMode ? "#8b3a3a" : "#e08080")}`, borderRadius: 4, padding: "10px 18px", zIndex: 1000, display: "flex", alignItems: "center", gap: 10, boxShadow: "0 4px 24px #00000040" }}>
+          <span style={{ fontSize: 14 }}>{shareToast === "copied" ? "✓" : "⚠️"}</span>
+          <span style={{ fontSize: 12, fontFamily: "monospace", color: shareToast === "copied" ? (darkMode ? "#7aeba3" : "#2a7a4a") : (darkMode ? "#f09090" : "#c04040"), letterSpacing: 0.5 }}>
+            {shareToast === "copied" ? "Share link copied to clipboard" : "No sessions selected yet"}
+          </span>
+        </div>
+      )}
+
       {conflictFlash && (
         <div style={{ position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)", background: darkMode ? "#2a1010" : "#fff0f0", border: `1px solid ${darkMode ? "#8b3a3a" : "#e08080"}`, borderRadius: 4, padding: "10px 18px", zIndex: 1000, maxWidth: 480, display: "flex", alignItems: "center", gap: 10, boxShadow: "0 4px 24px #00000040" }}>
           <span style={{ fontSize: 14 }}>⚠️</span>
           <span style={{ fontSize: 12, fontFamily: "monospace", color: darkMode ? "#f09090" : "#c04040", letterSpacing: 0.5, lineHeight: 1.5 }}>{conflictFlash.message}</span>
+        </div>
+      )}
+
+      {/* Shared schedule banner */}
+      {sharedSchedule && (
+        <div style={{ background: darkMode ? "#0d1f0d" : "#f0faf0", borderBottom: `1px solid ${darkMode ? "#1a3a1a" : "#b0ddb0"}`, padding: "10px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 14 }}>👁</span>
+            <span style={{ fontSize: 12, fontFamily: "monospace", color: darkMode ? "#7aeba3" : "#2a7a4a", letterSpacing: 0.5 }}>
+              Viewing {sharedSchedule.label} — {sharedSchedule.ids.size} session{sharedSchedule.ids.size !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <button onClick={() => { setSharedSchedule(null); window.history.replaceState({}, "", window.location.pathname); }} style={{ ...btnStyle(false), padding: "4px 12px", fontSize: 11, borderColor: darkMode ? "#1a3a1a" : "#b0ddb0", color: darkMode ? "#7aeba3" : "#2a7a4a" }}>
+            ✕ Exit shared view
+          </button>
         </div>
       )}
 
@@ -744,6 +797,11 @@ export default function ConferencePlanner() {
                 ✕ Deselect all
               </button>
             )}
+            {!sharedSchedule && (
+              <button onClick={copyShareLink} style={{ ...btnStyle(false), padding: "6px 14px", fontSize: 11, borderColor: T.borderSubtle }}>
+                🔗 Copy share link
+              </button>
+            )}
           </div>
           <select value={filterTrack} onChange={e => setFilterTrack(e.target.value)} style={{ background: T.selectBg, color: T.textLabel, border: `1px solid ${T.borderMid}`, padding: "5px 10px", fontSize: 11, fontFamily: "monospace", cursor: "pointer", borderRadius: 2 }}>
             {allTracks.map(t => <option key={t} value={t}>{t}</option>)}
@@ -773,7 +831,8 @@ export default function ConferencePlanner() {
                 {sessions.map((s) => {
                   const trackColors = TRACK_COLORS[s.track] || TRACK_COLORS["Networking & Events"];
                   const colors = trackColors[darkMode ? "dark" : "light"];
-                  const isSelected = !!selected[s.id];
+                  const isSelected = sharedSchedule ? sharedSchedule.ids.has(s.id) : !!selected[s.id];
+                  const isOwnSelected = !!selected[s.id];
                   const isExpanded = expandedId === s.id;
                   const isNetworking = ["Networking & Events","Roundtables","EXP"].includes(s.track);
                   const conflictingWith = !isSelected ? findConflict(s, selected) : null;
